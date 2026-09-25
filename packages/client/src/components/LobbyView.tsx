@@ -53,7 +53,8 @@ export const LobbyView: React.FC<Props> = ({
   const [networkInfo, setNetworkInfo] = useState<{ localIp: string; port: number | string; publicUrl: string | null } | null>(null);
 
   useEffect(() => {
-    fetch('/api/network-info')
+    const apiBase = import.meta.env.VITE_SERVER_URL || '';
+    fetch(`${apiBase}/api/network-info`)
       .then((res) => res.json())
       .then((data) => setNetworkInfo(data))
       .catch(() => {});

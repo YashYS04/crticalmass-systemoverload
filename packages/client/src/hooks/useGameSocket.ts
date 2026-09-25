@@ -24,8 +24,9 @@ export function useGameSocket() {
   const [lastWarpMessage, setLastWarpMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    // Connect to server (relative path works with Vite proxy or production single port)
-    const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io({
+    // Connect to server (uses VITE_SERVER_URL if deployed to Vercel, or current origin)
+    const serverUrl = import.meta.env.VITE_SERVER_URL || undefined;
+    const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(serverUrl, {
       transports: ['websocket', 'polling'],
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
