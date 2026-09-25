@@ -12,6 +12,8 @@ import { AlertTriangle, Radio, Sparkles } from 'lucide-react';
 export const App: React.FC = () => {
   const {
     isConnected,
+    activeServerUrl,
+    updateServerUrl,
     roomState,
     myPlayerId,
     screenShake,
@@ -28,6 +30,8 @@ export const App: React.FC = () => {
 
   const [crtEnabled, setCrtEnabled] = useState<boolean>(true);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const [showServerModal, setShowServerModal] = useState<boolean>(false);
+  const [inputServerUrl, setInputServerUrl] = useState<string>(activeServerUrl || '');
 
   const toggleSound = () => {
     const next = !soundEnabled;
@@ -61,9 +65,62 @@ export const App: React.FC = () => {
 
       {/* Connection & Error Toasts */}
       {!isConnected && (
-        <div className="bg-red-600/90 text-white text-xs font-mono py-1.5 px-4 text-center sticky top-0 z-50 flex items-center justify-center gap-2 shadow-lg">
+        <div className="bg-red-600/90 text-white text-xs font-mono py-2 px-4 text-center sticky top-0 z-50 flex flex-wrap items-center justify-center gap-2 shadow-lg">
           <Radio className="w-3.5 h-3.5 animate-spin" />
-          <span>STATION LINK OFFLINE — RECONNECTING TO GAME SERVER...</span>
+          <span>STATION LINK OFFLINE</span>
+          {activeServerUrl && (
+            <span className="text-red-200 text-[10px] hidden sm:inline">({activeServerUrl})</span>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              setInputServerUrl(activeServerUrl || '');
+              setShowServerModal(true);
+            }}
+            className="ml-2 px-2 py-0.5 rounded bg-black/40 hover:bg-black/60 border border-white/30 text-amber-300 font-bold uppercase text-[10px]"
+          >
+            CONFIGURE BACKEND URL
+          </button>
+        </div>
+      )}
+
+      {/* Backend Server Configuration Modal */}
+      {showServerModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-space-900 border-2 border-cyan-500 rounded-2xl p-6 max-w-sm w-full text-center panel-bevel shadow-2xl">
+            <h3 className="font-display font-black text-base text-white mb-2 uppercase">
+              GAME SERVER CONNECTION
+            </h3>
+            <p className="text-xs text-slate-400 font-mono mb-4 text-left">
+              Because Vercel hosts only the frontend, enter your live WebSocket server URL (e.g. Render, Railway, or Cloudflare tunnel):
+            </p>
+            <input
+              type="text"
+              placeholder="https://..."
+              value={inputServerUrl}
+              onChange={(e) => setInputServerUrl(e.target.value)}
+              className="w-full bg-space-950 border border-slate-700 rounded-xl px-3 py-2 text-white font-mono text-xs mb-3 focus:outline-none focus:border-cyan-400"
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  updateServerUrl(inputServerUrl);
+                  setShowServerModal(false);
+                }}
+                className="flex-1 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-mono text-xs font-bold shadow"
+              >
+                CONNECT & SAVE
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowServerModal(false)}
+                className="py-2 px-4 rounded-xl bg-space-800 hover:bg-space-700 text-slate-300 font-mono text-xs"
+              >
+                CANCEL
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

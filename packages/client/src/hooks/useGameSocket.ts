@@ -12,9 +12,41 @@ const SESSION_TOKEN_KEY = 'so_session_token';
 const ROOM_CODE_KEY = 'so_room_code';
 const PLAYER_NAME_KEY = 'so_player_name';
 
+export const SERVER_URL_STORAGE_KEY = 'so_server_url';
+export const DEFAULT_PUBLIC_BACKEND = 'https://surfing-voted-conclusions-elite.trycloudflare.com';
+
+export function getResolvedServerUrl(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+
+  // 1. URL parameter override: ?server=https://...
+  const params = new URLSearchParams(window.location.search);
+  const serverParam = params.get('server');
+  if (serverParam) {
+    localStorage.setItem(SERVER_URL_STORAGE_KEY, serverParam);
+    return serverParam;
+  }
+
+  // 2. Custom server URL from localStorage
+  const saved = localStorage.getItem(SERVER_URL_STORAGE_KEY);
+  if (saved) return saved;
+
+  // 3. Vite environment variable from build
+  if (import.meta.env.VITE_SERVER_URL) {
+    return import.meta.env.VITE_SERVER_URL;
+  }
+
+  // 4. If running on Vercel, default to live backend tunnel
+  if (window.location.hostname.includes('vercel.app')) {
+    return DEFAULT_PUBLIC_BACKEND;
+  }
+
+  return undefined;
+}
+
 export function useGameSocket() {
   const socketRef = useRef<Socket<ServerToClientEvents, ClientToServerEvents> | null>(null);
   const [isConnected, setIsConnected] = useState(false);
+  const [activeServerUrl, setActiveServerUrl] = useState<string | undefined>(getResolvedServerUrl);
   const [roomState, setRoomState] = useState<RoomPublicState | null>(null);
   const [myPlayerId, setMyPlayerId] = useState<string | null>(() => {
     return localStorage.getItem(SESSION_TOKEN_KEY);
@@ -24,11 +56,10 @@ export function useGameSocket() {
   const [lastWarpMessage, setLastWarpMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    // Connect to server (uses VITE_SERVER_URL if deployed to Vercel, or current origin)
-    const serverUrl = import.meta.env.VITE_SERVER_URL || undefined;
+    const serverUrl = getResolvedServerUrl();
     const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io(serverUrl, {
       transports: ['websocket', 'polling'],
-      reconnectionAttempts: 10,
+      reconnectionAttempts: 15,
       reconnectionDelay: 1000,
     });
     socketRef.current = socket;
@@ -141,8 +172,21 @@ export function useGameSocket() {
     window.location.reload();
   }, []);
 
+  const updateServerUrl = useCallback((newUrl: string) => {
+    const trimmed = newUrl.trim();
+    if (trimmed) {
+      localStorage.setItem(SERVER_URL_STORAGE_KEY, trimmed);
+    } else {
+      localStorage.removeItem(SERVER_URL_STORAGE_KEY);
+    }
+    setActiveServerUrl(trimmed || undefined);
+    window.location.reload();
+  }, []);
+
   return {
     isConnected,
+    activeServerUrl,
+    updateServerUrl,
     roomState,
     myPlayerId,
     screenShake,
