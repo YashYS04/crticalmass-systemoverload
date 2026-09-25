@@ -12,6 +12,7 @@
   <img src="https://img.shields.io/badge/Language-TypeScript_5.4-3178c6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/Styling-Tailwind_CSS-38bdf8?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind" />
   <img src="https://img.shields.io/badge/Audio-Web_Audio_API-f59e0b?style=for-the-badge" alt="Web Audio" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="MIT License" />
 </p>
 
 <p align="center">
@@ -183,6 +184,12 @@ node test-e2e.js
    * Listen for directives from other crewmates that match controls on your console.
    * Fulfill tasks before the countdown bar empties to prevent catastrophic hull breaches.
 5. **Escape the Corridor:** Clear all 5 sectors to claim victory and view the squad MVP debrief!
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
