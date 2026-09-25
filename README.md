@@ -91,7 +91,11 @@ Consoles are never static. The procedural math engine allocates each crewmate a 
 
 ### 1. Strict State Machine (FSM) Action Filter
 Prevents invalid transitions or race conditions by filtering client actions through state guards:
-$$\text{LOBBY} \longrightarrow \text{STARTING (3s Countdown)} \longrightarrow \text{IN\_GAME} \longrightarrow \text{VICTORY} \;|\; \text{GAME\_OVER}$$
+
+```text
+[ LOBBY ] ────► [ STARTING (3s) ] ────► [ IN_GAME ] ────► [ VICTORY | GAME_OVER ]
+```
+
 * Actions like `UPDATE_CONTROL` sent outside `IN_GAME` are rejected immediately.
 * Ownership authorization guarantees clients can only manipulate hardware assigned to them.
 
