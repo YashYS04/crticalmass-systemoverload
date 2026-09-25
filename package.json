@@ -1,0 +1,16 @@
+{
+  "name": "system-overload-root",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:server": "npm --workspace=packages/server run dev",
+    "dev:client": "npm --workspace=packages/client run dev",
+    "build:client": "npm --workspace=packages/client run build",
+    "build:server": "npm --workspace=packages/server run build",
+    "build": "npm run build:client && npm run build:server",
+    "start": "npm --workspace=packages/server run start"
+  }
+}
